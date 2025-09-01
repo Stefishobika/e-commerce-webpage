@@ -1,0 +1,701 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Secure Product Catalog with Cart</title>
+    <!-- Use the Inter font from Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <!-- Load Tailwind CSS from CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+      body {
+        font-family: 'Inter', sans-serif;
+        background: #f3f4f6;
+      }
+      .card {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+      }
+      .card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+      }
+      .product-card {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+      }
+      .product-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
+      }
+    </style>
+</head>
+<body class="p-4 md:p-8">
+
+    <!-- Login & Auth Container -->
+    <div id="auth-container" class="flex items-center justify-center min-h-screen bg-gray-100 p-4">
+        <div class="card bg-white p-8 rounded-2xl shadow-xl w-full max-w-md transition-all duration-300 transform scale-100">
+            <!-- Message Box -->
+            <div id="message-box" class="hidden mb-4 p-4 rounded-lg text-center font-semibold"></div>
+
+            <!-- Login Section -->
+            <div id="login-section">
+                <h1 class="text-3xl font-bold text-center text-gray-800 mb-6">Log In</h1>
+                <form id="login-form-password" class="space-y-4">
+                    <input type="email" id="login-email" placeholder="Email" required class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200">
+                    <input type="password" id="login-password" placeholder="Password" required class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200">
+                    <button type="submit" class="w-full bg-blue-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-blue-700 transition duration-200">Log In</button>
+                </form>
+                <div class="text-center mt-4 space-y-2">
+                    <button id="show-otp-login" class="text-sm text-gray-500 hover:text-blue-600 transition duration-200">Log In with OTP</button>
+                    <button id="show-register" class="block mx-auto text-sm text-gray-500 hover:text-blue-600 transition duration-200">Don't have an account? Sign Up</button>
+                    <button id="show-forgot-password" class="block mx-auto text-sm text-gray-500 hover:text-blue-600 transition duration-200">Forgot password?</button>
+                </div>
+            </div>
+            
+            <!-- OTP Login Section -->
+            <div id="otp-login-section" class="hidden">
+                <h1 class="text-3xl font-bold text-center text-gray-800 mb-6">Log In with OTP</h1>
+                <form id="otp-send-form" class="space-y-4">
+                    <input type="email" id="otp-login-email" placeholder="Email" required class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200">
+                    <button type="submit" class="w-full bg-blue-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-blue-700 transition duration-200">Send OTP</button>
+                </form>
+                <form id="otp-verify-form" class="space-y-4 hidden mt-4">
+                    <input type="text" id="otp-code" placeholder="Enter OTP" required class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200">
+                    <button type="submit" class="w-full bg-green-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-green-700 transition duration-200">Verify OTP</button>
+                </form>
+                <div class="text-center mt-4">
+                    <button id="show-password-login" class="text-sm text-gray-500 hover:text-blue-600 transition duration-200">Back to Password Login</button>
+                </div>
+            </div>
+
+            <!-- Registration Form -->
+            <div id="register-section" class="hidden">
+                <h1 class="text-3xl font-bold text-center text-gray-800 mb-6">Sign Up</h1>
+                <form id="register-form" class="space-y-4">
+                    <input type="email" id="register-email" placeholder="Email" required class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200">
+                    <input type="password" id="register-password" placeholder="Password" required class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200">
+                    <button type="submit" class="w-full bg-green-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-green-700 transition duration-200">Register</button>
+                </form>
+                <div class="text-center mt-4">
+                    <button id="show-login-from-register" class="text-sm text-gray-500 hover:text-blue-600 transition duration-200">Already have an account? Log In</button>
+                </div>
+            </div>
+
+            <!-- Forgot Password Sections -->
+            <div id="forgot-password-section" class="hidden">
+                <h1 class="text-3xl font-bold text-center text-gray-800 mb-6">Forgot Password</h1>
+                <p class="text-center text-gray-600 mb-4">Choose how you would like to reset your password.</p>
+                <div class="space-y-4">
+                    <button id="forgot-password-link-btn" class="w-full bg-yellow-500 text-white font-bold py-3 px-4 rounded-lg hover:bg-yellow-600 transition duration-200">Send Reset Link</button>
+                    <button id="forgot-password-otp-btn" class="w-full bg-yellow-500 text-white font-bold py-3 px-4 rounded-lg hover:bg-yellow-600 transition duration-200">Send OTP</button>
+                </div>
+                <div class="text-center mt-4">
+                    <button id="show-login-from-forgot" class="text-sm text-gray-500 hover:text-blue-600 transition duration-200">Back to Login</button>
+                </div>
+            </div>
+
+            <div id="forgot-password-link-email-section" class="hidden">
+                <h1 class="text-3xl font-bold text-center text-gray-800 mb-6">Reset via Link</h1>
+                <p class="text-center text-gray-600 mb-4">Enter your email to receive a password reset link.</p>
+                <form id="forgot-password-link-form" class="space-y-4">
+                    <input type="email" id="forgot-link-email" placeholder="Email" required class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200">
+                    <button type="submit" class="w-full bg-yellow-500 text-white font-bold py-3 px-4 rounded-lg hover:bg-yellow-600 transition duration-200">Send Reset Link</button>
+                </form>
+            </div>
+
+            <div id="forgot-password-otp-email-section" class="hidden">
+                <h1 class="text-3xl font-bold text-center text-gray-800 mb-6">Reset via OTP</h1>
+                <p class="text-center text-gray-600 mb-4">Enter your email to receive an OTP.</p>
+                <form id="forgot-password-otp-form" class="space-y-4">
+                    <input type="email" id="forgot-otp-email" placeholder="Email" required class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200">
+                    <button type="submit" class="w-full bg-yellow-500 text-white font-bold py-3 px-4 rounded-lg hover:bg-yellow-600 transition duration-200">Send OTP</button>
+                </form>
+            </div>
+
+            <div id="forgot-password-verify-otp-section" class="hidden">
+                <h1 class="text-3xl font-bold text-center text-gray-800 mb-6">Verify OTP</h1>
+                <p class="text-center text-gray-600 mb-4">Enter the OTP sent to your email and your new password.</p>
+                <form id="forgot-password-verify-otp-form" class="space-y-4">
+                    <input type="text" id="forgot-otp-code" placeholder="Enter OTP" required class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200">
+                    <input type="password" id="forgot-new-password" placeholder="New Password" required class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200">
+                    <button type="submit" class="w-full bg-green-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-green-700 transition duration-200">Reset Password</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Product Catalog Container -->
+    <div id="catalog-container" class="hidden">
+        <header class="mb-8 flex flex-col md:flex-row justify-between items-center text-center md:text-left">
+            <div>
+                <h1 class="text-4xl md:text-5xl font-extrabold text-gray-900 leading-tight">
+                    Our Products
+                </h1>
+                <p class="text-lg md:text-xl text-gray-600 mt-2">
+                    Explore our curated catalog of amazing items.
+                </p>
+            </div>
+            <div class="mt-4 md:mt-0 flex items-center space-x-4">
+                <button id="cart-btn" class="relative bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition duration-200">
+                    <i class="fas fa-shopping-cart mr-2"></i>Cart
+                    <span id="cart-count" class="absolute top-0 right-0 transform translate-x-1/2 -translate-y-1/2 bg-red-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">0</span>
+                </button>
+                <button id="logout-btn" class="bg-red-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-red-600 transition duration-200">Log Out</button>
+            </div>
+        </header>
+
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row gap-8">
+            <!-- Filter Sidebar -->
+            <aside class="w-full md:w-1/4 p-6 bg-white rounded-xl shadow-lg h-fit">
+                <h2 class="text-xl font-bold text-gray-800 mb-4">Filters</h2>
+                <div class="mb-6">
+                    <input type="text" id="searchInput" placeholder="Search products..." class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200">
+                </div>
+                <div class="mb-6">
+                    <h3 class="font-semibold text-gray-700 mb-2">Price Range</h3>
+                    <div class="flex items-center space-x-2 mb-2">
+                        <span id="minPriceDisplay" class="text-sm text-gray-600">$0</span>
+                        <input type="range" id="priceRange" min="0" max="1000" value="1000" class="w-full">
+                        <span id="maxPriceDisplay" class="text-sm text-gray-600">$1000</span>
+                    </div>
+                </div>
+                <div class="mb-6">
+                    <h3 class="font-semibold text-gray-700 mb-2">Category</h3>
+                    <div id="categoryFilter" class="space-y-2"></div>
+                </div>
+                <div class="mb-6">
+                    <h3 class="font-semibold text-gray-700 mb-2">Availability</h3>
+                    <div class="flex items-center space-x-2">
+                        <input type="checkbox" id="inStockCheckbox" checked class="rounded text-blue-600 focus:ring-blue-500">
+                        <label for="inStockCheckbox" class="text-sm text-gray-600">In Stock</label>
+                    </div>
+                </div>
+            </aside>
+
+            <!-- Product Grid -->
+            <main class="w-full md:w-3/4">
+                <div id="productGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Cart Modal -->
+    <div id="cart-modal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden items-center justify-center z-50">
+        <div class="bg-white p-6 rounded-lg shadow-xl w-11/12 md:w-1/2 lg:w-1/3">
+            <div class="flex justify-between items-center border-b pb-3 mb-4">
+                <h2 class="text-2xl font-bold">Your Cart</h2>
+                <button id="close-cart-btn" class="text-gray-500 hover:text-gray-800 transition">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+            <div id="cart-items" class="max-h-80 overflow-y-auto mb-4 space-y-4">
+                <!-- Cart items will be rendered here -->
+            </div>
+            <div class="flex justify-between items-center font-bold text-lg border-t pt-4">
+                <span>Total:</span>
+                <span id="cart-total">$0.00</span>
+            </div>
+            <button id="checkout-btn" class="mt-4 w-full bg-green-500 text-white font-bold py-3 px-4 rounded-lg hover:bg-green-600 transition duration-200">Checkout</button>
+        </div>
+    </div>
+
+    <script>
+        const products = [
+            { id: 1, name: "Noise-Cancelling Headphones", description: "Immerse yourself in pure sound with these comfortable, over-ear headphones.", image: "https://placehold.co/400x300/e5e7eb/6b7280?text=Headphones", price: 299, inStock: true, category: "Electronics", brand: "AudioLux", rating: 4.8 },
+            { id: 2, name: "Vintage Leather Wallet", description: "Handcrafted from full-grain leather, this wallet will age beautifully over time.", image: "https://placehold.co/400x300/d1d5db/374151?text=Wallet", price: 65, inStock: false, category: "Accessories", brand: "Timeless Leather", rating: 4.5 },
+            { id: 3, name: "Smart Watch", description: "Track your fitness, health, and notifications with this sleek and modern smartwatch.", image: "https://placehold.co/400x300/6b7280/d1d5db?text=Smartwatch", price: 199, inStock: true, category: "Wearables", brand: "TechFit", rating: 4.7 },
+            { id: 4, name: "Espresso Machine", description: "Brew cafe-quality coffee at home with this compact and easy-to-use espresso machine.", image: "https://placehold.co/400x300/a3a3a3/e5e7eb?text=Espresso+Machine", price: 450, inStock: true, category: "Kitchen Appliances", brand: "BrewMaster", rating: 4.9 },
+            { id: 5, name: "Wireless Gaming Mouse", description: "Experience lag-free gaming with a super-fast response time and customizable buttons.", image: "https://placehold.co/400x300/6b7280/e5e7eb?text=Gaming+Mouse", price: 89, inStock: true, category: "Gaming", brand: "GamerCore", rating: 4.6 },
+            { id: 6, name: "Organic Cotton T-Shirt", description: "A classic tee made from 100% organic cotton for ultimate comfort and sustainability.", image: "https://placehold.co/400x300/d1d5db/6b7280?text=T-Shirt", price: 35, inStock: true, category: "Apparel", brand: "EcoWear", rating: 4.2 },
+            { id: 7, name: "4K LED Monitor", description: "Stunning visuals and vibrant colors for work and entertainment.", image: "https://placehold.co/400x300/a3a3a3/e5e7eb?text=Monitor", price: 549, inStock: true, category: "Electronics", brand: "ViewPro", rating: 4.7 },
+            { id: 8, name: "Portable Bluetooth Speaker", description: "Take your music anywhere with this powerful and rugged waterproof speaker.", image: "https://placehold.co/400x300/6b7280/d1d5db?text=Speaker", price: 79, inStock: true, category: "Audio", brand: "SoundGo", rating: 4.5 },
+            { id: 9, name: "High-Performance Blender", description: "Effortlessly crush ice and blend smoothies with a powerful motor and durable blades.", image: "https://placehold.co/400x300/a3a3a3/6b7280?text=Blender", price: 120, inStock: false, category: "Kitchen Appliances", brand: "BlendForce", rating: 4.8 },
+            { id: 10, name: "Hiking Backpack", description: "Ergonomic and spacious backpack with multiple compartments for all your outdoor gear.", image: "https://placehold.co/400x300/d1d5db/374151?text=Backpack", price: 110, inStock: true, category: "Outdoor", brand: "TrailBlaze", rating: 4.6 },
+            { id: 11, name: "Smartphone", description: "The latest smartphone with a powerful processor and a stunning camera.", image: "https://placehold.co/400x300/6b7280/d1d5db?text=Smartphone", price: 899, inStock: true, category: "Electronics", brand: "Innovate", rating: 4.9 },
+            { id: 12, name: "Desk Lamp", description: "Modern and minimalist desk lamp with adjustable brightness and color temperature.", image: "https://placehold.co/400x300/a3a3a3/e5e7eb?text=Desk+Lamp", price: 45, inStock: true, category: "Home", brand: "BrightSpot", rating: 4.4 }
+        ];
+
+        // API endpoint of your server
+        const API_URL = 'http://localhost:3000/api';
+
+        // --- UI Elements ---
+        const authContainer = document.getElementById('auth-container');
+        const catalogContainer = document.getElementById('catalog-container');
+        const messageBox = document.getElementById('message-box');
+        
+        // --- Authentication Elements ---
+        const loginSection = document.getElementById('login-section');
+        const otpLoginSection = document.getElementById('otp-login-section');
+        const registerSection = document.getElementById('register-section');
+        const forgotPasswordSection = document.getElementById('forgot-password-section');
+        const forgotPasswordLinkEmailSection = document.getElementById('forgot-password-link-email-section');
+        const forgotPasswordOtpEmailSection = document.getElementById('forgot-password-otp-email-section');
+        const forgotPasswordVerifyOtpSection = document.getElementById('forgot-password-verify-otp-section');
+        
+        const loginFormPassword = document.getElementById('login-form-password');
+        const registerForm = document.getElementById('register-form');
+        const otpSendForm = document.getElementById('otp-send-form');
+        const otpVerifyForm = document.getElementById('otp-verify-form');
+        const forgotPasswordLinkForm = document.getElementById('forgot-password-link-form');
+        const forgotPasswordOtpForm = document.getElementById('forgot-password-otp-form');
+        const forgotPasswordVerifyOtpForm = document.getElementById('forgot-password-verify-otp-form');
+        
+        const showRegisterBtn = document.getElementById('show-register');
+        const showLoginBtn = document.getElementById('show-login-from-register');
+        const showForgotBtn = document.getElementById('show-forgot-password');
+        const showLoginFromForgotBtn = document.getElementById('show-login-from-forgot');
+        const showOtpLoginBtn = document.getElementById('show-otp-login');
+        const showPasswordLoginBtn = document.getElementById('show-password-login');
+        const forgotPasswordLinkBtn = document.getElementById('forgot-password-link-btn');
+        const forgotPasswordOtpBtn = document.getElementById('forgot-password-otp-btn');
+        const logoutBtn = document.getElementById('logout-btn');
+
+        // --- Catalog Elements ---
+        const productGrid = document.getElementById('productGrid');
+        const searchInput = document.getElementById('searchInput');
+        const priceRange = document.getElementById('priceRange');
+        const minPriceDisplay = document.getElementById('minPriceDisplay');
+        const maxPriceDisplay = document.getElementById('maxPriceDisplay');
+        const categoryFilter = document.getElementById('categoryFilter');
+        const inStockCheckbox = document.getElementById('inStockCheckbox');
+        const cartBtn = document.getElementById('cart-btn');
+        const cartCount = document.getElementById('cart-count');
+        const cartModal = document.getElementById('cart-modal');
+        const closeCartBtn = document.getElementById('close-cart-btn');
+        const cartItemsContainer = document.getElementById('cart-items');
+        const cartTotal = document.getElementById('cart-total');
+        // --- Cart State ---
+        let cart = JSON.parse(localStorage.getItem('cart')) || [];
+        
+
+        // --- Utility Functions ---
+
+        // Show a message in the message box
+        const showMessage = (message, isSuccess = true) => {
+            messageBox.textContent = message;
+            messageBox.classList.remove('hidden');
+            if (isSuccess) {
+                messageBox.classList.remove('bg-red-200', 'text-red-800');
+                messageBox.classList.add('bg-green-200', 'text-green-800');
+            } else {
+                messageBox.classList.remove('bg-green-200', 'text-green-800');
+                messageBox.classList.add('bg-red-200', 'text-red-800');
+            }
+            setTimeout(() => {
+                messageBox.classList.add('hidden');
+            }, 5000);
+        };
+
+        // Show the correct form section
+        const showAuthSection = (sectionToShow) => {
+            const sections = [loginSection, otpLoginSection, registerSection, forgotPasswordSection, 
+                                forgotPasswordLinkEmailSection, forgotPasswordOtpEmailSection, forgotPasswordVerifyOtpSection];
+            sections.forEach(section => section.classList.add('hidden'));
+            sectionToShow.classList.remove('hidden');
+        };
+
+        // Handle page state: show login or catalog
+        const checkAuthAndRender = () => {
+            const token = localStorage.getItem('jwtToken');
+            if (token) {
+                // User is authenticated, show the catalog
+                authContainer.classList.add('hidden');
+                catalogContainer.classList.remove('hidden');
+                displayProducts(products); // Initial product display
+                renderCart(); // Render the cart
+            } else {
+                // No token, show the login screen
+                authContainer.classList.remove('hidden');
+                catalogContainer.classList.add('hidden');
+                showAuthSection(loginSection); // Default to login view
+            }
+        };
+
+        // --- Authentication Form Handlers ---
+
+        registerForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('register-email').value;
+            const password = document.getElementById('register-password').value;
+
+            try {
+                const response = await fetch(`${API_URL}/register`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password }),
+                });
+                const data = await response.json();
+                if (response.ok) {
+                    showMessage(data.message);
+                    showAuthSection(loginSection);
+                } else {
+                    showMessage(data.message, false);
+                }
+            } catch (error) {
+                showMessage('Failed to connect to the server. Please try again.', false);
+            }
+        });
+
+        loginFormPassword.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('login-email').value;
+            const password = document.getElementById('login-password').value;
+
+            try {
+                const response = await fetch(`${API_URL}/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password }),
+                });
+                const data = await response.json();
+                if (response.ok) {
+                    showMessage(data.message);
+                    localStorage.setItem('jwtToken', data.token); 
+                    console.log("Logged in successfully. JWT Token:", data.token);
+                    checkAuthAndRender();
+                } else {
+                    showMessage(data.message, false);
+                }
+            } catch (error) {
+                showMessage('Failed to connect to the server. Please try again.', false);
+            }
+        });
+
+        otpSendForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('otp-login-email').value;
+            try {
+                const response = await fetch(`${API_URL}/send-otp`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email }),
+                });
+                const data = await response.json();
+                if (response.ok) {
+                    showMessage(data.message);
+                    document.getElementById('otp-verify-form').classList.remove('hidden');
+                    otpSendForm.classList.add('hidden');
+                } else {
+                    showMessage(data.message, false);
+                }
+            } catch (error) {
+                showMessage('Failed to connect to the server.', false);
+            }
+        });
+
+        otpVerifyForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('otp-login-email').value;
+            const otp = document.getElementById('otp-code').value;
+
+            try {
+                const response = await fetch(`${API_URL}/verify-otp`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, otp }),
+                });
+                const data = await response.json();
+                if (response.ok) {
+                    showMessage(data.message);
+                    localStorage.setItem('jwtToken', data.token); 
+                    console.log("Logged in successfully via OTP. JWT Token:", data.token);
+                    checkAuthAndRender();
+                } else {
+                    showMessage(data.message, false);
+                }
+            } catch (error) {
+                showMessage('Failed to connect to the server.', false);
+            }
+        });
+
+        forgotPasswordLinkForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('forgot-link-email').value;
+            try {
+                const response = await fetch(`${API_URL}/forgot-password`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email }),
+                });
+                const data = await response.json();
+                showMessage(data.message);
+            } catch (error) {
+                showMessage('Failed to connect to the server. Please try again.', false);
+            }
+        });
+        
+        forgotPasswordOtpForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('forgot-otp-email').value;
+            try {
+                const response = await fetch(`${API_URL}/forgot-password-otp`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email }),
+                });
+                const data = await response.json();
+                if (response.ok) {
+                    showMessage(data.message);
+                    showAuthSection(forgotPasswordVerifyOtpSection);
+                } else {
+                    showMessage(data.message, false);
+                }
+            } catch (error) {
+                showMessage('Failed to connect to the server.', false);
+            }
+        });
+
+        forgotPasswordVerifyOtpForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('forgot-otp-email').value;
+            const otp = document.getElementById('forgot-otp-code').value;
+            const newPassword = document.getElementById('forgot-new-password').value;
+
+            try {
+                const response = await fetch(`${API_URL}/reset-password-otp`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, otp, newPassword }),
+                });
+                const data = await response.json();
+                if (response.ok) {
+                    showMessage(data.message);
+                    showAuthSection(loginSection);
+                } else {
+                    showMessage(data.message, false);
+                }
+            } catch (error) {
+                showMessage('Failed to connect to the server.', false);
+            }
+        });
+        
+        logoutBtn.addEventListener('click', () => {
+            localStorage.removeItem('jwtToken');
+            localStorage.removeItem('cart');
+            cart = [];
+            showMessage('Logged out successfully!', true);
+            checkAuthAndRender();
+        });
+
+        // --- UI State Management ---
+        showRegisterBtn.addEventListener('click', () => showAuthSection(registerSection));
+        showLoginBtn.addEventListener('click', () => showAuthSection(loginSection));
+        showForgotBtn.addEventListener('click', () => showAuthSection(forgotPasswordSection));
+        showLoginFromForgotBtn.addEventListener('click', () => showAuthSection(loginSection));
+        showOtpLoginBtn.addEventListener('click', () => {
+            showAuthSection(otpLoginSection);
+            document.getElementById('otp-verify-form').classList.add('hidden');
+            document.getElementById('otp-send-form').classList.remove('hidden');
+        });
+        showPasswordLoginBtn.addEventListener('click', () => showAuthSection(loginSection));
+        forgotPasswordLinkBtn.addEventListener('click', () => showAuthSection(forgotPasswordLinkEmailSection));
+        forgotPasswordOtpBtn.addEventListener('click', () => showAuthSection(forgotPasswordOtpEmailSection));
+
+        // --- Cart Modal Listeners ---
+        cartBtn.addEventListener('click', () => {
+            cartModal.classList.remove('hidden');
+            cartModal.classList.add('flex');
+            renderCart();
+        });
+
+        closeCartBtn.addEventListener('click', () => {
+            cartModal.classList.remove('flex');
+            cartModal.classList.add('hidden');
+        });
+
+        window.addEventListener('click', (e) => {
+            if (e.target === cartModal) {
+                cartModal.classList.remove('flex');
+                cartModal.classList.add('hidden');
+            }
+        });
+
+
+        // --- Product Catalog Functions ---
+        
+        // Initial setup for catalog
+        const getUniqueCategories = () => {
+            const allCategories = products.map(p => p.category);
+            return [...new Set(allCategories)].sort();
+        };
+
+        const populateCategoryFilters = () => {
+            const categories = getUniqueCategories();
+            categoryFilter.innerHTML = ''; // Clear existing categories
+            categories.forEach(category => {
+                const categoryHtml = `
+                    <div class="flex items-center space-x-2">
+                        <input type="checkbox" id="cat-${category}" value="${category}" class="category-checkbox rounded text-blue-600 focus:ring-blue-500">
+                        <label for="cat-${category}" class="text-sm text-gray-600">${category}</label>
+                    </div>
+                `;
+                categoryFilter.innerHTML += categoryHtml;
+            });
+        };
+
+        const displayProducts = (productsToDisplay) => {
+            productGrid.innerHTML = '';
+            if (productsToDisplay.length === 0) {
+                productGrid.innerHTML = '<p class="text-center text-gray-500 w-full col-span-full">No products found matching your criteria.</p>';
+                return;
+            }
+            productsToDisplay.forEach(product => {
+                const stockStatus = product.inStock ? 'In Stock' : 'Out of Stock';
+                const stockColor = product.inStock ? 'text-green-600' : 'text-red-600';
+                
+                let actionButtonHtml = '';
+                if (product.inStock) {
+                    actionButtonHtml = `
+                        <button class="add-to-cart-btn mt-4 w-full bg-blue-600 text-white font-bold py-2 rounded-lg hover:bg-blue-700 transition duration-200" data-product-id="${product.id}">
+                            <i class="fas fa-cart-plus mr-2"></i>Add to Cart
+                        </button>
+                    `;
+                } else {
+                    actionButtonHtml = `
+                        <button class="notify-btn mt-4 w-full bg-gray-400 text-white font-bold py-2 rounded-lg hover:bg-gray-500 transition duration-200" data-product-id="${product.id}">
+                            Notify Me Later
+                        </button>
+                    `;
+                }
+
+                const productHtml = `
+                    <div class="product-card bg-white rounded-xl shadow-md p-6 flex flex-col items-center text-center">
+                        <img src="${product.image}" alt="${product.name}" class="rounded-lg mb-4 w-full h-48 object-cover">
+                        <h3 class="text-lg font-bold text-gray-800">${product.name}</h3>
+                        <p class="text-sm text-gray-500 mt-1 mb-2">${product.description}</p>
+                        <p class="text-xl font-bold text-gray-900 mt-auto">$${product.price.toFixed(2)}</p>
+                        <p class="text-sm ${stockColor} font-semibold">${stockStatus}</p>
+                        <div class="mt-2 text-yellow-500 text-sm">
+                            <span class="font-bold">${product.rating}</span> / 5
+                        </div>
+                        ${actionButtonHtml}
+                    </div>
+                `;
+                productGrid.innerHTML += productHtml;
+            });
+            // Attach event listeners to new buttons
+            document.querySelectorAll('.add-to-cart-btn').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    const productId = parseInt(e.currentTarget.dataset.productId);
+                    addToCart(productId);
+                });
+            });
+            document.querySelectorAll('.notify-btn').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    const productId = parseInt(e.currentTarget.dataset.productId);
+                    const productName = products.find(p => p.id === productId)?.name || 'Product';
+                    showMessage(`We'll notify you when '${productName}' is back in stock!`);
+                });
+            });
+        };
+
+        const handleSearchAndFilter = () => {
+            const searchQuery = searchInput.value.toLowerCase();
+            const maxPrice = parseInt(priceRange.value);
+            const inStockOnly = inStockCheckbox.checked;
+            const selectedCategories = Array.from(document.querySelectorAll('.category-checkbox:checked')).map(cb => cb.value);
+
+            const filteredProducts = products.filter(product => {
+                // Search filter
+                const matchesSearch = product.name.toLowerCase().includes(searchQuery) || product.description.toLowerCase().includes(searchQuery);
+                // Price filter
+                const matchesPrice = product.price <= maxPrice;
+                // Availability filter
+                const matchesAvailability = !inStockOnly || product.inStock;
+                // Category filter
+                const matchesCategory = selectedCategories.length === 0 || selectedCategories.includes(product.category);
+
+                return matchesSearch && matchesPrice && matchesAvailability && matchesCategory;
+            });
+            displayProducts(filteredProducts);
+        };
+
+        // --- Cart Functions ---
+        const saveCart = () => {
+            localStorage.setItem('cart', JSON.stringify(cart));
+            cartCount.textContent = cart.length;
+        };
+
+        const renderCart = () => {
+            cartItemsContainer.innerHTML = '';
+            if (cart.length === 0) {
+                cartItemsContainer.innerHTML = '<p class="text-center text-gray-500">Your cart is empty.</p>';
+                cartTotal.textContent = '$0.00';
+                return;
+            }
+
+            let total = 0;
+            cart.forEach(item => {
+                const itemTotal = item.price * item.quantity;
+                total += itemTotal;
+                const cartItemHtml = `
+                    <div class="flex items-center justify-between border-b pb-2">
+                        <div class="flex items-center space-x-4">
+                            <img src="${item.image}" alt="${item.name}" class="w-16 h-16 rounded-lg object-cover">
+                            <div>
+                                <h4 class="font-semibold text-gray-800">${item.name}</h4>
+                                <p class="text-sm text-gray-500">$${item.price.toFixed(2)} x ${item.quantity}</p>
+                            </div>
+                        </div>
+                        <button class="remove-from-cart-btn text-red-500 hover:text-red-700 transition" data-product-id="${item.id}">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                   </div>
+                `;
+                cartItemsContainer.innerHTML += cartItemHtml;
+            });
+
+            cartTotal.textContent = `$${total.toFixed(2)}`;
+
+            // Attach event listeners to remove buttons
+            document.querySelectorAll('.remove-from-cart-btn').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    const productId = parseInt(e.currentTarget.dataset.productId);
+                    removeFromCart(productId);
+                });
+            });
+        };
+
+        const addToCart = (productId) => {
+            const product = products.find(p => p.id === productId);
+            if (!product) return;
+
+            const existingItem = cart.find(item => item.id === productId);
+
+            if (existingItem) {
+                existingItem.quantity++;
+            } else {
+                cart.push({ ...product, quantity: 1 });
+            }
+            saveCart();
+            renderCart();
+            showMessage(`${product.name} added to cart!`);
+        };
+
+        const removeFromCart = (productId) => {
+            cart = cart.filter(item => item.id !== productId);
+            saveCart();
+            renderCart();
+            showMessage('Item removed from cart!', false);
+        };
+
+        
+
+        // --- Catalog Event Listeners ---
+        searchInput.addEventListener('input', handleSearchAndFilter);
+        priceRange.addEventListener('input', () => {
+            maxPriceDisplay.textContent = `$${priceRange.value}`;
+            handleSearchAndFilter();
+        });
+        inStockCheckbox.addEventListener('change', handleSearchAndFilter);
+        categoryFilter.addEventListener('change', handleSearchAndFilter);
+        
+        // --- Initialization ---
+        populateCategoryFilters();
+        checkAuthAndRender();
+        cartCount.textContent = cart.length;
+    </script>
+</body>
+</html>
